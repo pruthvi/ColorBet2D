@@ -16,9 +16,13 @@ public class GameManager : MonoBehaviour
     public bool betRed, betGreen, playerWin = false;
 
     private cardFlip cf;
-    public GameObject selectionCanvas, outofChips, result;
+    public GameObject selectionCanvas, outofChips, result/*, chipPrefab*/;
+    //public Transform chipPanel;
     public Image betColor;
 
+    public Transform chipsPannelTransform;
+    public GameObject extraChipsPrefab;
+    public Text extraChipsTxt;
 
     void Awake()
     {
@@ -34,9 +38,40 @@ public class GameManager : MonoBehaviour
         chips = PlayerPrefs.GetInt("Chips", maxChips);
         updateChips();
         updateHouseChips();
-
+        CalculateChipsCount();
     }
-    void chip()
+
+    private void CalculateChipsCount()
+    {
+        var extraChips = chips - maxChips;
+        if (extraChips > 0)
+        {
+            UpdateExtraChipsCount();
+            extraChipsTxt.gameObject.SetActive(true);
+            extraChipsPrefab.SetActive(true);
+            var chipCount = (extraChips / 10) - 1;
+            for (int i = 0; i < chipCount; i++)
+            {
+                Instantiate(extraChipsPrefab, chipsPannelTransform);
+            }
+        }
+    }
+
+    public void UpdateExtraChipsCount()
+    {
+        var extraChipsLeft = chips - maxChips;
+        if (extraChipsLeft > 0)
+        {
+            extraChipsTxt.text = extraChipsLeft.ToString();
+        }
+        else
+        {
+            extraChipsTxt.gameObject.SetActive(false);
+            extraChipsPrefab.gameObject.SetActive(false);
+        }
+    }
+
+    public void chip()
     {
         chips -= 10;
         updateChips();
@@ -91,6 +126,7 @@ public class GameManager : MonoBehaviour
     void updateChips()
     {
         txtChip.text = " Chips : " + chips;
+        UpdateExtraChipsCount();
     }
 
     void updateHouseChips()
@@ -136,11 +172,11 @@ public class GameManager : MonoBehaviour
         result.SetActive(true);
         if (playerWin)
         {
-            txtResult.text = " Horray! You have won!";
+            txtResult.text = "Horray! You have won!";
         }
         else
         {
-            txtResult.text = " Sorry! You have lost. Wanna try Again?";
+            txtResult.text = "Sorry! You have lost. Wanna try Again?";
         }
 
 
@@ -156,4 +192,24 @@ public class GameManager : MonoBehaviour
     {
         Application.Quit();
     }
+
+    //     void SpawnChips()
+    //     {
+    //         if (chips <= 100)
+    //         {
+    //             int spawnNo = chips / 10;
+    //             SpawningChips(spawnNo);
+    //         }
+
+
+    //     }
+    // void SpawningChips(int spawnNo){
+    //         GameObject[] chipIcons = new GameObject[spawnNo];
+    //         for (int i = 0; i < spawnNo; i++)
+    //         {
+    //             GameObject chipIcon = Instantiate(chipPrefab, this.transform.position, Quaternion.identity, chipPanel);
+    //             chipIcons[i] = chipIcon;
+    //         }
+    // }
+
 }

@@ -2,14 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class ChipController : MonoBehaviour
 {
-    private float _movementTime = 2f;
+    private float _movementTime = 4f;
     private Vector2 _destinationPosition = Vector2.zero;
 
+    private GameManager gm;
+    private void Awake()
+    {
+        gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+    }
 
     public void OnChipClicked()
     {
+        gm.chip();
         StartCoroutine(MoveChip());
     }
 
@@ -23,4 +30,7 @@ public class ChipController : MonoBehaviour
             yield return null;
         }
     }
+
+
+
 }
