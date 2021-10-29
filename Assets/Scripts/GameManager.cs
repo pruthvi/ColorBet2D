@@ -6,23 +6,21 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("UI Elements")]
     public Button btnBet, btnCall;
-
     public Text txtChip, txtHouseChip, txtBetColor, txtOutOfChips, txtResult;
+    public Image betColor;
+
+    [Header("Chip Counts")]
     public int chips;
     public int maxChips = 100;
     public int betValue = 0;
     public float delay = 2f;
+
     public bool betRed, betGreen, playerWin = false;
 
     private cardFlip cf;
-    public GameObject selectionCanvas, outofChips, result/*, chipPrefab*/;
-    //public Transform chipPanel;
-    public Image betColor;
-
-    public Transform chipsPannelTransform;
-    public GameObject extraChipsPrefab;
-    public Text extraChipsTxt;
+    public GameObject selectionCanvas, outofChips, result, extraChips;
 
     void Awake()
     {
@@ -36,61 +34,58 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         chips = PlayerPrefs.GetInt("Chips", maxChips);
+        if (chips < maxChips)
+        {
+            chips = maxChips;
+        }
         updateChips();
         updateHouseChips();
-        CalculateChipsCount();
+        ExtraChipCount();
     }
 
-    private void CalculateChipsCount()
-    {
-        var extraChips = chips - maxChips;
-        if (extraChips > 0)
-        {
-            UpdateExtraChipsCount();
-            extraChipsTxt.gameObject.SetActive(true);
-            extraChipsPrefab.SetActive(true);
-            var chipCount = (extraChips / 10) - 1;
-            for (int i = 0; i < chipCount; i++)
-            {
-                Instantiate(extraChipsPrefab, chipsPannelTransform);
-            }
-        }
-    }
-
-    public void UpdateExtraChipsCount()
-    {
-        var extraChipsLeft = chips - maxChips;
-        if (extraChipsLeft > 0)
-        {
-            extraChipsTxt.text = extraChipsLeft.ToString();
-        }
-        else
-        {
-            extraChipsTxt.gameObject.SetActive(false);
-            extraChipsPrefab.gameObject.SetActive(false);
-        }
-    }
 
     public void chip()
     {
+        bet();
         chips -= 10;
         updateChips();
         if (chips == 0)
         {
             chips = maxChips;
-            //    Debug.Log("Chips refilled");
             outofChips.SetActive(true);
             txtChip.text = " Chips : " + chips;
         }
+        else if (chips > 100)
+        {
+            ActiveExtraChip(true);
+            extraChips.GetComponent<ExtraChipController>().CheckExtraChips();
+        }
+    }
+    void ExtraChipCount()
+    {
+        if (chips <= 100)
+        {
+            ActiveExtraChip(false);
+        }
+        else if (chips > 100)
+        {
+            ActiveExtraChip(true);
+            extraChips.GetComponent<ExtraChipController>().CheckExtraChips();
+
+        }
+    }
+
+
+    public void ActiveExtraChip(bool active)
+    {
+        extraChips.SetActive(active);
     }
 
 
     void bet()
     {
         betValue += 10;
-        // Debug.Log("Bet : " + betValue);
         updateHouseChips();
-        chip();
     }
 
 
@@ -104,7 +99,6 @@ public class GameManager : MonoBehaviour
         if (drawResult && betRed || betGreen)
         {
             playerWin = true;
-            // Debug.Log("Player Wins!");
             chips += (betValue * 2);
             updateChips();
             betValue = 0;
@@ -114,7 +108,6 @@ public class GameManager : MonoBehaviour
         {
             playerWin = false;
             betValue = 0;
-            // Debug.Log("Player LOST!");
             updateHouseChips();
         }
         StartCoroutine(showResult(delay));
@@ -126,7 +119,6 @@ public class GameManager : MonoBehaviour
     void updateChips()
     {
         txtChip.text = " Chips : " + chips;
-        UpdateExtraChipsCount();
     }
 
     void updateHouseChips()
@@ -192,24 +184,5 @@ public class GameManager : MonoBehaviour
     {
         Application.Quit();
     }
-
-    //     void SpawnChips()
-    //     {
-    //         if (chips <= 100)
-    //         {
-    //             int spawnNo = chips / 10;
-    //             SpawningChips(spawnNo);
-    //         }
-
-
-    //     }
-    // void SpawningChips(int spawnNo){
-    //         GameObject[] chipIcons = new GameObject[spawnNo];
-    //         for (int i = 0; i < spawnNo; i++)
-    //         {
-    //             GameObject chipIcon = Instantiate(chipPrefab, this.transform.position, Quaternion.identity, chipPanel);
-    //             chipIcons[i] = chipIcon;
-    //         }
-    // }
 
 }
