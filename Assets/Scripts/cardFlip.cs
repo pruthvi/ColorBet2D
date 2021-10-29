@@ -2,37 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class cardFlip : MonoBehaviour
+/// <summary>
+///     Script to flip card when "Call' button is clicked and reveals outcome card. Scripts uses animation to flip card and Instantiate a new card with outcome color.
+/// </summary>
+public class CardFlip : MonoBehaviour
 {
-    Animator anim;
-    public GameObject blankCard;
-
-
-    void Start()
+    private Animator anim;      // Gets Animator component to change its parameters
+    public GameObject blankCard;    // Gets a blank card prefab for new card
+    private GameManager gm;
+    void Awake()
     {
         anim = GetComponent<Animator>();
+        gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
     }
 
+    /// <summary>
+    /// Function to Flip the Card with animation
+    /// </summary>
     public void FlipCard()
     {
-        anim.SetBool("Flip", true);
+        anim.SetBool("Flip", true);     // Sets boolen parameter value in the animator so that transition occurs and Flip animation is played.
     }
 
-    void WinCard(GameObject newCard, Color col)
-    {
-        SpriteRenderer sr = newCard.GetComponent<SpriteRenderer>();
-        sr.color = col;
-        sr.flipY = true;
-        newCard.GetComponent<Animator>().SetBool("FlipBack", true);
-
-    }
+    /// <summary>
+    /// Functions creates a new card based on the outcome color of red or green
+    /// </summary>
     void GetWinnerCard()
     {
-        GameObject winnerCard = Instantiate(blankCard, this.transform.position, Quaternion.Euler(0, 90, 0));
-        winnerCard.GetComponent<cardFlip>().enabled = false;
+        GameObject winnerCard = Instantiate(blankCard, this.transform.position, Quaternion.Euler(0, 90, 0));    // Creates new card at 90 so that it is not visible
+        winnerCard.GetComponent<CardFlip>().enabled = false;    // Disables this script in the new card
 
-        GameManager gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
-        if (gm.playerWin && gm.betRed)
+        if (gm.playerWin && gm.betRed)      // Checks whether Player won or not, what color player bet on and creates the new card accordingly
         {
             WinCard(winnerCard, Color.red);
         }
@@ -49,7 +49,18 @@ public class cardFlip : MonoBehaviour
         {
             WinCard(winnerCard, Color.red);
         }
+        Destroy(this.gameObject);       // Destroys this GameObject as this card is already been fliped
+    }
 
-        Destroy(this.gameObject);
+    /// <summary>
+    /// Function to assign color values to new card and play flip back animation 
+    /// </summary>
+    /// <param name="col">Parameter contains color value to be assigned to new card </param> 
+    void WinCard(GameObject newCard, Color col)
+    {
+        SpriteRenderer sr = newCard.GetComponent<SpriteRenderer>();
+        sr.color = col;
+        sr.flipY = true;        // Flips Y axis of the card for perfect animation
+        newCard.GetComponent<Animator>().SetBool("FlipBack", true);     // Plays FlipBack animation to turn the card facing front
     }
 }
