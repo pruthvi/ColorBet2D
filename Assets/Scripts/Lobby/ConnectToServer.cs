@@ -140,7 +140,7 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        PhotonNetwork.LoadLevel("Multiplay");
+        PhotonNetwork.LoadLevel("Main");
     }
 
 
