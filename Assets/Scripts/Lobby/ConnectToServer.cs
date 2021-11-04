@@ -13,6 +13,7 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
     [SerializeField] InputField inputPlayerName;
     [SerializeField] InputField roomNameInput;
     [SerializeField] Text txtRoomName;
+    [SerializeField] int maxPlayers = 6;
 
     [SerializeField] GameObject btnStartGame;
     [SerializeField] Text txtError;
@@ -62,7 +63,10 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
             Debug.Log("Room name is empty");
             return;
         }
-        PhotonNetwork.CreateRoom(roomNameInput.text);
+        RoomOptions options = new RoomOptions();
+        options.MaxPlayers = (byte)maxPlayers;
+        PhotonNetwork.CreateRoom(roomNameInput.text, options);
+
         LoadingMenu();   //prevents player from clicking anything while room is being created at server
     }
     public override void OnCreateRoomFailed(short returnCode, string message)
@@ -107,6 +111,10 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
         for (int i = 0; i < players.Length; i++)
         {
             Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().Setup(players[i]);
+        }
+        if (PhotonNetwork.PlayerList.Length == maxPlayers)
+        {
+            StartGame();
         }
         btnStartGame.SetActive(PhotonNetwork.IsMasterClient);
     }

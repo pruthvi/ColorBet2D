@@ -5,10 +5,14 @@ using UnityEngine.UI;
 
 public class OtherPlayerController : MonoBehaviour
 {
-    [SerializeField] Text txtPlayerName;
+    public Text txtPlayerName;
     [SerializeField] Text txtBet;
 
     [SerializeField] Image imgChip;
+    [SerializeField] Image imgBG;
+
+    public bool playerCalled = false;
+    public string playerColor;
 
     public int actorId;
 
@@ -22,14 +26,22 @@ public class OtherPlayerController : MonoBehaviour
         txtBet.text = "Bet : " + value.ToString();
     }
 
-    public void Called(string param1)
+    public void Called()
     {
-        // imgChip.color = Color.green;
-        Debug.Log("Called function exe: " + param1);
+        //  Debug.Log("A Player called! ");
+        var tempColor = imgBG.color;
+        tempColor.a = 1f;
+        imgBG.color = tempColor;
+        playerCalled = true;
+        //imgBG.color.a = 1f;
+        // imgBG.canvasRenderer.SetAlpha(0.01f);
+        // imgBG.CrossFadeAlpha(1, 2.0f, false);
+
     }
 
     public void ColorSelect(string color)
     {
+        playerColor = color;
         if (color == "red")
         {
             imgChip.color = Color.red;

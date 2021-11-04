@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     /// Card Flip script on the middle Card gameobject.
     /// </summary>
     [Header("Required Game Objects")]
-    public GameObject selectionCanvas, outofChips, result, extraChips;
+    public GameObject selectionCanvas, outofChips, waiting, result, extraChips;
 
     private CardFlip cf;
 
@@ -47,8 +47,8 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        Button call = btnCall.GetComponent<Button>();
-        call.onClick.AddListener(calling);
+        //  Button call = btnCall.GetComponent<Button>();
+        //   call.onClick.AddListener(calling);
     }
 
     void Start()
@@ -182,15 +182,28 @@ public class GameManager : MonoBehaviour
 
     #region Functions on Call
     // Function when call button is pressed
-    void calling()
+    public void GameResult(bool didRedWon)
     {
-        bool drawResult = (Random.value > 0.5f);        // Draws random true, false value for winning
+        //bool drawResult = (Random.value > 0.5f);        // Draws random true, false value for winning
         cf = GameObject.FindGameObjectWithTag("Card").GetComponent<CardFlip>();
         cf.FlipCard();
 
-        if (drawResult && betRed || betGreen)   // Checks if player has won
+        if (didRedWon && betRed)
         {
             playerWin = true;
+        }
+        else if (!didRedWon && betGreen)
+        {
+            playerWin = true;
+        }
+        else
+        {
+            playerWin = false;
+        }
+
+        if (playerWin)   // Checks if player has won
+        {
+            // playerWin = true;
             chips += (betValue * 2);    // Double the chip value
             UpdateChips();
             betValue = 0;               // Resets bet value for next gameplay
@@ -198,7 +211,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            playerWin = false;
+            // playerWin = false;
             betValue = 0;
             UpdateHouseChips();
         }

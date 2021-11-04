@@ -10,6 +10,7 @@ public class CardFlip : MonoBehaviour
     private Animator anim;      // Gets Animator component to change its parameters
     public GameObject blankCard;    // Gets a blank card prefab for new card
     private GameManager gm;
+    [SerializeField] Transform parent;
     void Awake()
     {
         anim = GetComponent<Animator>();
@@ -29,7 +30,7 @@ public class CardFlip : MonoBehaviour
     /// </summary>
     void GetWinnerCard()
     {
-        GameObject winnerCard = Instantiate(blankCard, this.transform.position, Quaternion.Euler(0, 90, 0));    // Creates new card at 90 so that it is not visible
+        GameObject winnerCard = Instantiate(blankCard, this.transform.position, Quaternion.Euler(0, 90, 0), parent);    // Creates new card at 90 so that it is not visible
         winnerCard.GetComponent<CardFlip>().enabled = false;    // Disables this script in the new card
 
         if (gm.playerWin && gm.betRed)      // Checks whether Player won or not, what color player bet on and creates the new card accordingly

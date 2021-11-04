@@ -16,6 +16,8 @@ public class NetworkManager : MonoBehaviour
     public Text txtPlayerName;
     private PhotonView pv;
     private GameManager gm;
+    [SerializeField] GameObject waitingScreen;
+    int noPlayerCalled = 0;
     void Awake()
     {
         Instance = this;
@@ -35,9 +37,9 @@ public class NetworkManager : MonoBehaviour
         {
             otherPlayers[i] = Instantiate(otherPlayerPrefab, playerPanel);
             otherPlayers[i].GetComponent<OtherPlayerController>().SetOtherPlayerName(PhotonNetwork.PlayerListOthers[i].NickName);
-            Debug.Log(PhotonNetwork.PlayerListOthers[i].NickName + " has number: " + i);
+            //    Debug.Log(PhotonNetwork.PlayerListOthers[i].NickName + " has number: " + i);
             otherPlayers[i].GetComponent<OtherPlayerController>().actorId = PhotonNetwork.PlayerListOthers[i].ActorNumber;
-            Debug.Log(" UniquePlayer ID: " + PhotonNetwork.PlayerListOthers[i].UserId);
+            // Debug.Log(" UniquePlayer ID: " + PhotonNetwork.PlayerListOthers[i].UserId);
             //otherPlayers[i].GetComponent<OtherPlayerController>().SetOtherPlayerBet(0);
 
             //otherPlayer[i] = PhotonNetwork.PlayerListOthers[i];
@@ -90,20 +92,6 @@ public class NetworkManager : MonoBehaviour
     public void GetBetValue(int betVal, PhotonMessageInfo info)
     {
 
-        // Debug.Log("Actor Number : " + info.Sender.ActorNumber);
-        // int playerNo;
-        // if (info.Sender.ActorNumber == 1)
-        // {
-        //     playerNo = 0;
-        // }
-        // else
-        // {
-        //     playerNo = info.Sender.ActorNumber - 1;
-        // }
-        // Debug.Log("Player Number : " + playerNo);
-
-        // otherPlayers[playerNo].GetComponent<OtherPlayerController>().SetOtherPlayerBet(betVal);
-
         for (int i = 0; i < PhotonNetwork.PlayerListOthers.Length; i++)
         {
             if (info.Sender.ActorNumber == otherPlayers[i].GetComponent<OtherPlayerController>().actorId)
@@ -113,29 +101,96 @@ public class NetworkManager : MonoBehaviour
             }
         }
 
-
-
     }
 
 
     public void CallButtonPressed()
     {
-        Debug.Log("Call button pressed");
-
-        pv.RPC("Call", RpcTarget.OthersBuffered, "some data");
+        //gm.GameResult(true);
+        pv.RPC("Call", RpcTarget.OthersBuffered);
+        waitingScreen.SetActive(true);
+        noPlayerCalled += 1;
+        checkEveryoneCalled();
     }
 
     [PunRPC]
-    public void Call(string param1, PhotonMessageInfo info)
+    public void Call(PhotonMessageInfo info)
     {
-        int playerNo = info.Sender.ActorNumber - 1;
-        Debug.Log("Actor Number : " + info.Sender.ActorNumber);
-        Debug.Log("Player Number : " + playerNo);
-        Debug.Log("Actor Name : " + info.Sender.NickName);
+        // Debug.Log("Actor Number : " + info.Sender.ActorNumber);
 
-        otherPlayers[playerNo].GetComponent<OtherPlayerController>().Called(param1);
+        for (int i = 0; i < PhotonNetwork.PlayerListOthers.Length; i++)
+        {
+            if (info.Sender.ActorNumber == otherPlayers[i].GetComponent<OtherPlayerController>().actorId)
+            {
+                // Debug.Log("Matching Player found");
+                noPlayerCalled += 1;
+                otherPlayers[i].GetComponent<OtherPlayerController>().Called();
+                break;
+            }
+        }
+        checkEveryoneCalled();
     }
 
+    void checkEveryoneCalled()
+    {
+        if (noPlayerCalled == PhotonNetwork.PlayerList.Length)
+        {
+            Debug.Log("Everyone has Called!");
+            drawResult();
+        }
+    }
+    void drawResult()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Debug.Log("This is MASTER Client!");
+            bool hasRedWon = (Random.value > 0.5f);
+            pv.RPC("Results", RpcTarget.AllBuffered, hasRedWon);
+        }
+    }
+
+    [PunRPC]
+    public void Results(bool hasRedWon, PhotonMessageInfo info)
+    {
+        Debug.Log("Did Red Win: " + hasRedWon);
+        gm.GameResult(hasRedWon);
+        ChecKOtherPlayersWin(hasRedWon);
+        waitingScreen.SetActive(false);
+    }
+
+    void ChecKOtherPlayersWin(bool redWin)
+    {
+
+        List<string> winners = new List<string>();
+        List<string> losers = new List<string>();
+        foreach (GameObject p in otherPlayers)
+        {
+            string card = p.GetComponent<OtherPlayerController>().playerColor;
+            if (redWin && card == "red")
+            {
+                winners.Add(p.GetComponent<OtherPlayerController>().txtPlayerName.text);
+            }
+            else if (!redWin && card == "green")
+            {
+                winners.Add(p.GetComponent<OtherPlayerController>().txtPlayerName.text);
+            }
+            else
+            {
+                losers.Add(p.GetComponent<OtherPlayerController>().txtPlayerName.text);
+            }
+        }
+        Debug.Log("winners: ");
+        foreach (string name in winners)
+        {
+            Debug.Log(name);
+        }
+        Debug.Log("losers: ");
+        foreach (string name in losers)
+        {
+            Debug.Log(name);
+        }
+
+    }
 
 
 }
