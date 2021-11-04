@@ -130,7 +130,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   txtPlayerName: {fileID: 8235054664151778405}
+  txtBet: {fileID: 7709818483349078905}
   imgChip: {fileID: 8063523635389365696}
+  userId: 
 --- !u!1 &3856782923674449333
 GameObject:
   m_ObjectHideFlags: 0

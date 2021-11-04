@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+using Photon.Pun;
 public class GameManager : MonoBehaviour
 {
     #region Declarations
@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
 
     private CardFlip cf;
 
+
     #endregion
 
     void Awake()
@@ -71,6 +72,8 @@ public class GameManager : MonoBehaviour
         betGreen = false;
         betColor.GetComponent<Image>().color = Color.red;
         txtBetColor.text = "You are betting on RED!";
+        NetworkManager.Instance.ColorSelection("red");
+
         DisableSelection();
     }
 
@@ -80,6 +83,8 @@ public class GameManager : MonoBehaviour
         betGreen = true;
         betColor.GetComponent<Image>().color = Color.green;
         txtBetColor.text = "You are betting on Green!";
+
+        NetworkManager.Instance.ColorSelection("green");
         DisableSelection();
     }
     /// <summary>
@@ -120,6 +125,7 @@ public class GameManager : MonoBehaviour
     void UpdateChips()
     {
         txtChip.text = " Chips : " + chips;
+
     }
     /// <summary>
     /// Updates Bet values.
@@ -136,6 +142,8 @@ public class GameManager : MonoBehaviour
     void UpdateHouseChips()
     {
         txtHouseChip.text = "Bet : " + betValue;
+        NetworkManager.Instance.SendBet(betValue);
+
     }
 
     /// <summary>

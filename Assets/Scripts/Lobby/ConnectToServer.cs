@@ -119,8 +119,6 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
     // #endregion
 
 
-
-
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().Setup(newPlayer);
