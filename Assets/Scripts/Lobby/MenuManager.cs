@@ -12,6 +12,10 @@ public class MenuManager : MonoBehaviour
         Instance = this;
     }
 
+    /// <summary>
+    /// Opens the Menu by String
+    /// </summary>
+    /// <param name="menuName">Menu name</param>
     public void OpenMenu(string menuName)
     {
         for (int i = 0; i < menus.Length; i++)
@@ -22,18 +26,22 @@ public class MenuManager : MonoBehaviour
             }
             else if (menus[i].open)
             {
-                CloseMenu(menus[i]);
+                CloseMenu(menus[i]);    // Closes all other menus
             }
         }
     }
 
+    /// <summary>
+    /// Opens the Menu
+    /// </summary>
+    /// <param name="menu"> Menu to be opened</param>
     public void OpenMenu(Menu menu)
     {
         for (int i = 0; i < menus.Length; i++)
         {
             if (menus[i].open)
             {
-                CloseMenu(menus[i]);
+                CloseMenu(menus[i]);    //Closes if other menu is opened
             }
         }
         menu.Open();

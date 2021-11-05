@@ -10,14 +10,22 @@ public class NetworkManager : MonoBehaviour
 
     public static NetworkManager Instance;
 
-    public GameObject otherPlayerPrefab;
+    [Header("Other Player Panel")]
     public Transform playerPanel;
+    public GameObject otherPlayerPrefab;
     public GameObject[] otherPlayers;
+
+    [Header("Player Name")]
     public Text txtPlayerName;
+
+
     private PhotonView pv;
     private GameManager gm;
+
+    [Header("Waiting Screen")]
     [SerializeField] GameObject waitingScreen;
-    int noPlayerCalled = 0;
+    int noPlayerCalled = 0; // Counted to check how many players called
+
     void Awake()
     {
         Instance = this;
@@ -27,140 +35,134 @@ public class NetworkManager : MonoBehaviour
 
     void Start()
     {
-        // Debug.Log("Photon Players: " + PhotonNetwork.PlayerListOthers.Length);
-
-        txtPlayerName.text = PhotonNetwork.NickName;
+        txtPlayerName.text = PhotonNetwork.NickName;                    // Sets player name
 
         otherPlayers = new GameObject[PhotonNetwork.PlayerListOthers.Length];
 
+        // Creates the player list on the right sidebar
         for (int i = 0; i < PhotonNetwork.PlayerListOthers.Length; i++)
         {
             otherPlayers[i] = Instantiate(otherPlayerPrefab, playerPanel);
             otherPlayers[i].GetComponent<OtherPlayerController>().SetOtherPlayerName(PhotonNetwork.PlayerListOthers[i].NickName);
-            //    Debug.Log(PhotonNetwork.PlayerListOthers[i].NickName + " has number: " + i);
             otherPlayers[i].GetComponent<OtherPlayerController>().actorId = PhotonNetwork.PlayerListOthers[i].ActorNumber;
-            // Debug.Log(" UniquePlayer ID: " + PhotonNetwork.PlayerListOthers[i].UserId);
-            //otherPlayers[i].GetComponent<OtherPlayerController>().SetOtherPlayerBet(0);
-
-            //otherPlayer[i] = PhotonNetwork.PlayerListOthers[i];
         }
 
         SendBet(gm.betValue);
     }
 
+    /// <summary>
+    /// Sends the information about the Player Color Selection to the network
+    /// </summary>
+    /// <param name="color">Color Selected by the player</param>
     public void ColorSelection(string color)
     {
         pv.RPC("CardColor", RpcTarget.OthersBuffered, color);
     }
 
+    // Gets the RPC call about a player selected color
     [PunRPC]
     public void CardColor(string color, PhotonMessageInfo info)
     {
         for (int i = 0; i < PhotonNetwork.PlayerListOthers.Length; i++)
         {
-            if (info.Sender.ActorNumber == otherPlayers[i].GetComponent<OtherPlayerController>().actorId)
+            if (info.Sender.ActorNumber == otherPlayers[i].GetComponent<OtherPlayerController>().actorId)   // Finds which player send the RPC call
             {
-                otherPlayers[i].GetComponent<OtherPlayerController>().ColorSelect(color);
+                otherPlayers[i].GetComponent<OtherPlayerController>().ColorSelect(color);   // Sets their chip color to the respective color that player is betting on
                 break;
             }
         }
-
-        /*        Debug.Log("Actor Number : " + info.Sender.ActorNumber);
-                // info.Sender.UserId
-                int playerNo;
-                if (info.Sender.ActorNumber == 1)
-                {
-                    playerNo = 0;
-                }
-                else
-                {
-                    playerNo = info.Sender.ActorNumber - 2;
-                }
-                Debug.Log("Player Number : " + playerNo);
-          
-        otherPlayers[playerNo].GetComponent<OtherPlayerController>().ColorSelect(color);
-*/
     }
 
 
+    /// <summary>
+    /// Sends the RPC call to the network updated bets player did
+    /// </summary>
+    /// <param name="chips">New Bet value</param>
     public void SendBet(int chips)
     {
         pv.RPC("GetBetValue", RpcTarget.OthersBuffered, chips);
     }
 
+    // Receives Bet value from the network
     [PunRPC]
     public void GetBetValue(int betVal, PhotonMessageInfo info)
     {
-
         for (int i = 0; i < PhotonNetwork.PlayerListOthers.Length; i++)
         {
-            if (info.Sender.ActorNumber == otherPlayers[i].GetComponent<OtherPlayerController>().actorId)
+            if (info.Sender.ActorNumber == otherPlayers[i].GetComponent<OtherPlayerController>().actorId)   // Finds player whose bet value was updated
             {
-                otherPlayers[i].GetComponent<OtherPlayerController>().SetOtherPlayerBet(betVal);
+                otherPlayers[i].GetComponent<OtherPlayerController>().SetOtherPlayerBet(betVal);    // Updates the value next to that player
                 break;
             }
         }
-
     }
 
 
+    // Function to execute when player clicks on call button
     public void CallButtonPressed()
     {
-        //gm.GameResult(true);
-        pv.RPC("Call", RpcTarget.OthersBuffered);
-        waitingScreen.SetActive(true);
-        noPlayerCalled += 1;
-        checkEveryoneCalled();
+        pv.RPC("Call", RpcTarget.OthersBuffered);   // Sends information to the network that this player has called.
+        waitingScreen.SetActive(true);              // Opens waiting screen, while other players are still betting
+        noPlayerCalled += 1;                        // Updates call counter 
+        CheckEveryoneCalled();
     }
 
     [PunRPC]
     public void Call(PhotonMessageInfo info)
     {
-        // Debug.Log("Actor Number : " + info.Sender.ActorNumber);
-
         for (int i = 0; i < PhotonNetwork.PlayerListOthers.Length; i++)
         {
             if (info.Sender.ActorNumber == otherPlayers[i].GetComponent<OtherPlayerController>().actorId)
             {
-                // Debug.Log("Matching Player found");
                 noPlayerCalled += 1;
                 otherPlayers[i].GetComponent<OtherPlayerController>().Called();
                 break;
             }
         }
-        checkEveryoneCalled();
+        CheckEveryoneCalled();
     }
-
-    void checkEveryoneCalled()
+    /// <summary>
+    /// Function which checks if all the players have called
+    /// </summary>
+    void CheckEveryoneCalled()
     {
         if (noPlayerCalled == PhotonNetwork.PlayerList.Length)
         {
             Debug.Log("Everyone has Called!");
-            drawResult();
+            DrawResult();
         }
     }
-    void drawResult()
+
+
+    /// <summary>
+    /// Draws probablity result on the MasterClient and send the result to everyone on the network
+    /// </summary>
+    void DrawResult()
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            Debug.Log("This is MASTER Client!");
-            bool hasRedWon = (Random.value > 0.5f);
+            bool hasRedWon = (Random.value > 0.5f);                 // Determines probability of Red color winning
             pv.RPC("Results", RpcTarget.AllBuffered, hasRedWon);
         }
     }
 
+
+    // Receives result from the network
     [PunRPC]
     public void Results(bool hasRedWon, PhotonMessageInfo info)
     {
-        Debug.Log("Did Red Win: " + hasRedWon);
-        gm.GameResult(hasRedWon);
+        gm.GameResult(hasRedWon);               // Executes result on the Card in the center of the game
         ChecKOtherPlayersWin(hasRedWon);
-        waitingScreen.SetActive(false);
+        waitingScreen.SetActive(false);         // Disables the waiting screen
     }
 
+    /// <summary>
+    /// Checks which other players have won and lost
+    /// </summary>
+    /// <param name="redWin">Did red color win?</param>
     void ChecKOtherPlayersWin(bool redWin)
     {
-
+        // Creates list of winners and losers
         List<string> winners = new List<string>();
         List<string> losers = new List<string>();
         foreach (GameObject p in otherPlayers)
@@ -179,6 +181,7 @@ public class NetworkManager : MonoBehaviour
                 losers.Add(p.GetComponent<OtherPlayerController>().txtPlayerName.text);
             }
         }
+
         Debug.Log("winners: ");
         foreach (string name in winners)
         {

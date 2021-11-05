@@ -16,29 +16,20 @@ public class OtherPlayerController : MonoBehaviour
 
     public int actorId;
 
+    #region Player Name
+    /// <summary>
+    /// Sets the name of this player
+    /// </summary>
     public void SetOtherPlayerName(string name)
     {
         txtPlayerName.text = name;
     }
+    #endregion
 
-    public void SetOtherPlayerBet(int value)
-    {
-        txtBet.text = "Bet : " + value.ToString();
-    }
-
-    public void Called()
-    {
-        //  Debug.Log("A Player called! ");
-        var tempColor = imgBG.color;
-        tempColor.a = 1f;
-        imgBG.color = tempColor;
-        playerCalled = true;
-        //imgBG.color.a = 1f;
-        // imgBG.canvasRenderer.SetAlpha(0.01f);
-        // imgBG.CrossFadeAlpha(1, 2.0f, false);
-
-    }
-
+    #region Player Color
+    /// <summary>
+    /// Sets Color on which this player is betting on
+    /// </summary>
     public void ColorSelect(string color)
     {
         playerColor = color;
@@ -52,7 +43,31 @@ public class OtherPlayerController : MonoBehaviour
         }
         else { Debug.Log("Error in Color Selection RPC"); }
     }
+    #endregion
 
+    #region Player Bet
+    /// <summary>
+    /// Sets the Bet value of this player
+    /// </summary>
+    /// <param name="value">Bet value</param>
+    public void SetOtherPlayerBet(int value)
+    {
+        txtBet.text = "Bet : " + value.ToString();
+    }
+    #endregion
+
+    #region Player Called
+    /// <summary>
+    /// Creates black background on the player who called
+    /// </summary>
+    public void Called()
+    {
+        var tempColor = imgBG.color;
+        tempColor.a = 1f;
+        imgBG.color = tempColor;
+        playerCalled = true;
+    }
+    #endregion
 
 
 }

@@ -8,12 +8,20 @@ public class PlayerListItem : MonoBehaviourPunCallbacks
 {
     Player player;
     public Text text;
+
+    /// <summary>
+    /// Create player name in the list
+    /// </summary>
     public void Setup(Player _player)
     {
         player = _player;
         text.text = _player.NickName;
     }
 
+    /// <summary>
+    /// Removes the player from the list, when player leaves
+    /// </summary>
+    /// <param name="otherPlayer">Player who left</param>
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         if (player == otherPlayer)

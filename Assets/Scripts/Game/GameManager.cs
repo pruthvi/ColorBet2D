@@ -31,7 +31,6 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private float delay = 2f;
 
-    [Header("Bet and Win switches")]
     public bool betRed, betGreen, playerWin = false;
 
     /// <summary>
@@ -44,12 +43,6 @@ public class GameManager : MonoBehaviour
 
 
     #endregion
-
-    void Awake()
-    {
-        //  Button call = btnCall.GetComponent<Button>();
-        //   call.onClick.AddListener(calling);
-    }
 
     void Start()
     {
@@ -72,8 +65,8 @@ public class GameManager : MonoBehaviour
         betGreen = false;
         betColor.GetComponent<Image>().color = Color.red;
         txtBetColor.text = "You are betting on RED!";
-        NetworkManager.Instance.ColorSelection("red");
 
+        NetworkManager.Instance.ColorSelection("red");
         DisableSelection();
     }
 
@@ -127,6 +120,7 @@ public class GameManager : MonoBehaviour
         txtChip.text = " Chips : " + chips;
 
     }
+
     /// <summary>
     /// Updates Bet values.
     /// </summary>
@@ -143,7 +137,6 @@ public class GameManager : MonoBehaviour
     {
         txtHouseChip.text = "Bet : " + betValue;
         NetworkManager.Instance.SendBet(betValue);
-
     }
 
     /// <summary>
@@ -184,7 +177,6 @@ public class GameManager : MonoBehaviour
     // Function when call button is pressed
     public void GameResult(bool didRedWon)
     {
-        //bool drawResult = (Random.value > 0.5f);        // Draws random true, false value for winning
         cf = GameObject.FindGameObjectWithTag("Card").GetComponent<CardFlip>();
         cf.FlipCard();
 
@@ -203,7 +195,6 @@ public class GameManager : MonoBehaviour
 
         if (playerWin)   // Checks if player has won
         {
-            // playerWin = true;
             chips += (betValue * 2);    // Double the chip value
             UpdateChips();
             betValue = 0;               // Resets bet value for next gameplay
@@ -211,7 +202,6 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // playerWin = false;
             betValue = 0;
             UpdateHouseChips();
         }

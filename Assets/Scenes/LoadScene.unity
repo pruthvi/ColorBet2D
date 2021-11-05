@@ -553,7 +553,7 @@ GameObject:
   - component: {fileID: 144603258}
   - component: {fileID: 144603257}
   m_Layer: 5
-  m_Name: btnCreateRoom (1)
+  m_Name: btnCreateRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -572,11 +572,11 @@ RectTransform:
   m_Children:
   - {fileID: 1422253401}
   m_Father: {fileID: 1702525508}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 300, y: -115}
+  m_AnchoredPosition: {x: 300, y: -35}
   m_SizeDelta: {x: 600, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &144603257
@@ -1497,7 +1497,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &731215323
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1694,11 +1694,11 @@ RectTransform:
   m_Children:
   - {fileID: 196482697}
   m_Father: {fileID: 1702525508}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 300, y: -35}
+  m_AnchoredPosition: {x: 300, y: -115}
   m_SizeDelta: {x: 600, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &916436295
@@ -2756,12 +2756,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputPlayerName: {fileID: 1109448614}
   roomNameInput: {fileID: 1181225071}
-  txtRoomName: {fileID: 435984417}
-  btnStartGame: {fileID: 1846631203}
   txtError: {fileID: 244401214}
+  txtRoomName: {fileID: 435984417}
+  maxPlayers: 6
   roomListContent: {fileID: 625078603}
   roomListItemPrefab: {fileID: 2395517961135025761, guid: 607d82e10a78e4247901ffb1dfb00452,
     type: 3}
+  btnStartGame: {fileID: 1846631203}
   playerListContent: {fileID: 998391030}
   playerListItemPrefab: {fileID: 584193244369322821, guid: 749706dfe8af43846b336caabb14b4d5,
     type: 3}
@@ -3388,8 +3389,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 916436294}
   - {fileID: 144603256}
+  - {fileID: 916436294}
   - {fileID: 1333224769}
   m_Father: {fileID: 1677199617}
   m_RootOrder: 0
